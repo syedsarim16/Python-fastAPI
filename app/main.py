@@ -2,28 +2,27 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .import models
+from . import models
 from .database import engine
-from .routers import post,y_user,auth,vote
+from .routers import post, y_user, auth, vote
 from .config import settings
 
-#models.Base.metadata.create_all(bind=engine) # This line is used to create the tables in the database if they do not exist
+# models.Base.metadata.create_all(bind=engine)  # Uncomment if you want to auto-create tables
 
-# Update origins for production - add your actual frontend domain
-origins=[
+origins = [
     "https://www.google.com",
-    "http://localhost:3000",  # For local development
-    "http://localhost:8080",  # For local development
-    "*"  # Allow all origins (remove this in production for security)
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "*"
 ]
 
-app=FastAPI()
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins, 
-    allow_credentials=True, 
-    allow_methods=["*"], 
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -40,12 +39,7 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
-# Essential for Railway deployment
+# ✅ This allows correct deployment via `python -m app.main`
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(
-        app, 
-        host="0.0.0.0", 
-        port=port,
-        log_level="info"
-    )
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, log_level="info")
