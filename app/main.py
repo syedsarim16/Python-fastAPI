@@ -40,8 +40,6 @@ def health_check():
     return {"status": "healthy"}
 
 # This allows correct deployment via `python -m app.main`
-import os
-import uvicorn
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))  # Use $PORT from Railway or fallback to 8000 locally
