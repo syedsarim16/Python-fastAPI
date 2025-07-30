@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from app.database import get_db_connection,Base
 import pytest
 
+
 SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username
                                           }:{settings.database_password
                                              }@{settings.database_hostname
@@ -20,22 +21,29 @@ engine=create_engine(SQLALCHEMY_DATABASE_URL)
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base.metadata.create_all(bind=engine) 
+@pytest.fixture
 
-def override_get_db_connection():
-    db=TestingSessionLocal()
+def session():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+
     try:
         yield db
+
     finally:
         db.close()
 
-app.dependency_overrides[get_db_connection]=override_get_db_connection
-
-
 @pytest.fixture
-def client():
-    Base.metadata.drop_all(bind=engine) 
-    Base.metadata.create_all(bind=engine) 
+def client(session):
+    def override_get_db_connection():
+            try:
+                yield session
+            finally:
+                session.close()
+
+    app.dependency_overrides[get_db_connection]=override_get_db_connection
+
     yield TestClient(app)
     
 
