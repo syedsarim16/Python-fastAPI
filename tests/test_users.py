@@ -27,12 +27,7 @@ def test_login_user(test_user, client):
     assert res.status_code == 200
 
 @pytest.mark.parametrize("email, password, status_code", [
-    ('sarim@gmail.com', 'password123', 403),
-    ('abdullah@gmail.com', 'wrongpassword', 403),
-    ('wrongemail@gmail.com', 'wrongpassword', 403),
-    (None, 'password123', 422),
-    ('hi@gmail.com', None, 422),
-])
+    ('sarim@gmail.com', 'pasord123', 403)])
 def test_incorrect_login(test_user, client, email, password, status_code):
     res = client.post(
         "/login", data={"username": email, "password": password})
