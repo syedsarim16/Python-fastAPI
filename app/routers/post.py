@@ -38,7 +38,7 @@ def get_posts(db: Session = Depends(get_db_connection),
     
    # return (post)
 
-@router.post("/create_posts",status_code=status.HTTP_201_CREATED,response_model=schemas.Post)
+@router.post("/",status_code=status.HTTP_201_CREATED,response_model=schemas.Post)
 def create_posts(post:schemas.CreatePost,db: Session = Depends(get_db_connection),
                  current_user: int = Depends(oauth2.get_current_user)):
     
