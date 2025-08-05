@@ -5,14 +5,24 @@ on: [push, pull_request]
 jobs:
   job1:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_HOSTNAME: localhost
+      DATABASE_PORT: 5432
+      DATABASE_PASSWORD: sarim%40123
+      DATABASE_NAME: fastapi
+      DATABASE_USERNAME: postgres
+      SECRET_KEY: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
     steps:
       - name: Pulling Git repo
         uses: actions/checkout@v2
 
-      - name: Install Python version 3.9
+      - name: Install Python 3.10
         uses: actions/setup-python@v2
         with:
           python-version: "3.10"
+
 
       - name: Update pip
         run: python -m pip install --upgrade pip
