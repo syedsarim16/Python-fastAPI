@@ -24,6 +24,13 @@ def get_db_connection():
     finally:
         db.close()
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 #we dont need this anymore because we are using SQLAlchemy ORM
 #while True:
     # Connect to the database
