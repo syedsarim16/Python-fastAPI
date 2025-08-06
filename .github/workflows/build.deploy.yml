@@ -29,7 +29,7 @@
             --health-interval 10s
             --health-timeout 5s
             --health-retries 5    
-            
+
       runs-on: ubuntu-latest
       steps:
         - name: Pulling Git repo
@@ -50,3 +50,4 @@
         - name: Test with pytest
           run: |
             python -m pytest tests --disable-warnings -v
+            
