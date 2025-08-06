@@ -15,3 +15,5 @@ class Settings(BaseSettings):
         env_file = os.path.join(os.path.dirname(__file__), ".env")  # 👈 full path
 
 settings = Settings()
+
+# This code defines a Settings class that uses Pydantic to manage application configuration.
