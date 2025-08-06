@@ -10,7 +10,9 @@ from app.database import Base
 from app import models
 from app.oauth2 import create_access_token
 
-# Test DB connection
+# Test DB connection string
+# Using a test database to avoid affecting the production database
+# Ensure that the test database is set up correctly in your environment
 SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test"
 
 # Engine and session setup
