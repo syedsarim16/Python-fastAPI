@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int
 
     class Config:
-        env_file = os.path.join(os.path.dirname(__file__), ".env")  # 👈 full path
+        env_file = os.path.join(os.path.dirname(__file__), ".env")  
 
 settings = Settings()
 
