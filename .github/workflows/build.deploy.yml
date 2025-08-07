@@ -2,26 +2,27 @@ name: Build and Deploy Code
 
 on: [push, pull_request]
 
+# This workflow builds and tests the code, and optionally deploys it to production.
 jobs:
   build:
-    environment:
-      name: testing
+    runs-on: ubuntu-latest
+    environment: testing
     env:
-      DATABASE_HOSTNAME: ${{ secrets.DATABASE_HOSTNAME }}
-      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALGORITHM: ${{ secrets.ALGORITHM }}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+      DATABASE_HOSTNAME: "${{ secrets.DATABASE_HOSTNAME }}"
+      DATABASE_PORT: "${{ secrets.DATABASE_PORT }}"
+      DATABASE_PASSWORD: "${{ secrets.DATABASE_PASSWORD }}"
+      DATABASE_NAME: "${{ secrets.DATABASE_NAME }}"
+      DATABASE_USERNAME: "${{ secrets.DATABASE_USERNAME }}"
+      SECRET_KEY: "${{ secrets.SECRET_KEY }}"
+      ALGORITHM: "${{ secrets.ALGORITHM }}"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}"
 
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-          POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
+          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}_test
         ports:
           - 5432:5432
         options: >-
@@ -30,23 +31,27 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    runs-on: ubuntu-latest
     steps:
-      - name: pulling git repo
+      - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install python version 3.9
+
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
           python-version: "3.9"
-      - name: update pip
+
+      - name: Upgrade pip
         run: python -m pip install --upgrade pip
-      - name: install all dependencies
+
+      - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: test with pytest
+
+      - name: Run tests with pytest
         run: |
           pip install pytest
           pytest
 
+      # Optional: Docker Hub login and build
       # - name: Login to Docker Hub
       #   uses: docker/login-action@v1
       #   with:
@@ -57,7 +62,7 @@ jobs:
       #   id: buildx
       #   uses: docker/setup-buildx-action@v1
 
-      # - name: Build and push
+      # - name: Build and push Docker image
       #   id: docker_build
       #   uses: docker/build-push-action@v2
       #   with:
@@ -68,35 +73,33 @@ jobs:
       #     tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi:latest
       #     cache-from: type=local,src=/tmp/.buildx-cache
       #     cache-to: type=local,dest=/tmp/.buildx-cache
-      # - name: Image digest
+
+      # - name: Show Docker image digest
       #   run: echo ${{ steps.docker_build.outputs.digest }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [build]
-    environment:
-      name: production
-    steps:
-      - name: pulling git repo
-        uses: actions/checkout@v2
-      - name: deploying to Heroku
-        uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+  #deploy:
+    #runs-on: ubuntu-latest
+    #needs: build
+    #environment:
+      #name: production
+    #steps:
+      #- name: Checkout code
+        #uses: actions/checkout@v2
 
-      - name: deploy to ubuntu server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{secrets.PROD_HOST}}
-          username: ${{secrets.PROD_USERNAME}}
-          password: ${{secrets.PROD_PASSWORD}}
-          script: |
-            cd app/src
-            git pull
-            echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl restart api
-      # login to our ubuntu
-      # cd /app/src
-      # git pull
-      # systemctl restart api
+      #- name: Deploy to Heroku
+        #uses: akhileshns/heroku-deploy@v3.12.12
+       # with:
+          #heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          #heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          #heroku_email: ${{ secrets.HEROKU_EMAIL }}
+
+     # - name: Deploy to Ubuntu server
+        #uses: appleboy/ssh-action@master
+        #with:
+          #host: ${{ secrets.PROD_HOST }}
+          #username: ${{ secrets.PROD_USERNAME }}
+          #password: ${{ secrets.PROD_PASSWORD }}
+          #script: |
+          #  cd app/src
+          #  git pull
+          #echo ${{ secrets.PROD_PASSWORD }} | sudo -S systemctl restart api 
