@@ -1,4 +1,4 @@
-'''import pytest
+import pytest
 from app import schemas
 from jose import jwt
 from app.config import settings
@@ -31,4 +31,4 @@ def test_login_user(test_user, client):
 def test_incorrect_login(test_user, client, email, password, status_code):
     res = client.post(
         "/login", data={"username": email, "password": password})
-    assert res.status_code ==status_code'''
+    assert res.status_code ==status_code
